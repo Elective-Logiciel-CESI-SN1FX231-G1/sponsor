@@ -2,7 +2,7 @@ import { Handler } from 'express'
 import SponsorCodeModel from '../models/SponsorCodeModel'
 import shortid from 'shortid'
 import SponsorshipModel from '../models/SponsorshipModel'
-
+import mqtt from '../mqtt'
 export const get: Handler = async (req, res) => {
   let sponsorCode = await SponsorCodeModel.findOne({ user: { _id: req.user?._id } }).exec()
   if (!sponsorCode) {
@@ -24,13 +24,14 @@ export const post: Handler = async (req, res) => {
   if (sponsored?._id === sponsor._id) return res.status(400).send('You cannot be sponsored by yourself')
   if (sponsored?.role !== sponsor.role) return res.status(400).send('You cannot be sponsored by an other role')
   if (await SponsorshipModel.findOne({ sponsored: { _id: req.user?._id } }).exec()) return res.status(400).send('You have been sponsored already')
-  const sponsorships = new SponsorshipModel({
+  const sponsorship = new SponsorshipModel({
     _id: shortid(),
     sponsor,
     sponsored
   })
-  await sponsorships.save()
-  res.status(201).send(sponsorships)
+  await sponsorship.save()
+  await mqtt.publish(`sponsor/sponsorship/${req.user?.role}`, JSON.stringify(sponsorship))
+  res.status(201).send(sponsorship)
 }
 
 export default {
