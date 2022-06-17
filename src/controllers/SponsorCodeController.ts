@@ -21,7 +21,8 @@ export const post: Handler = async (req, res) => {
   if (!sponsorCode) return res.send(400).send('Wrong sponsor code')
   const sponsored = req.user
   const sponsor = sponsorCode.user
-  if (sponsored?._id === sponsor._id) return res.status(400).send('You cannot sponsor yourself')
+  if (sponsored?._id === sponsor._id) return res.status(400).send('You cannot be sponsored by yourself')
+  if (sponsored?.role !== sponsor.role) return res.status(400).send('You cannot be sponsored by an other role')
   if (await SponsorshipModel.findOne({ sponsored: { _id: req.user?._id } }).exec()) return res.status(400).send('You have been sponsored already')
   const sponsorships = new SponsorshipModel({
     _id: shortid(),
