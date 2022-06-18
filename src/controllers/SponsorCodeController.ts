@@ -5,7 +5,6 @@ import SponsorshipModel from '../models/SponsorshipModel'
 import mqtt from '../mqtt'
 export const get: Handler = async (req, res) => {
   let sponsorCode = await SponsorCodeModel.findOne({ 'user._id': req.user?._id }).exec()
-
   if (!sponsorCode) {
     sponsorCode = new SponsorCodeModel({
       _id: shortid(),
@@ -19,8 +18,6 @@ export const get: Handler = async (req, res) => {
 
 export const post: Handler = async (req, res) => {
   const sponsorCode = await SponsorCodeModel.findOne({ code: req.body.code }).exec()
-  console.log(sponsorCode)
-
   if (!sponsorCode) return res.send(400).send('Wrong sponsor code')
   const sponsored = req.user
   const sponsor = sponsorCode.user
