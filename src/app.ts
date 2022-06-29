@@ -7,6 +7,7 @@ import SponsorshipRouter from './routes/SponsorshipRouter'
 const app = express()
 
 app.use(auth)
+app.use('/api', express.static('apidoc'))
 app.use('/api/sponsorships', SponsorshipRouter)
 app.use('/api/sponsor-code', SponsorCodeRouter)
 
